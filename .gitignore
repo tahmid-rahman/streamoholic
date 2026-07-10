@@ -41,12 +41,10 @@ Thumbs.db
 *.pem
 *.key
 
-# Tailwind CSS output (generated during build)
-tailwind.config.js
-!tailwind.config.js  # Keep config, ignore output
+# Tailwind CSS output (generated during build) - but keep source files
+# !tailwind.config.js is kept in repo
 *.css
-src/index.css
-!src/index.css  # Keep source CSS, uncomment if you have separate compiled output
+!src/index.css
 
 # Cache files
 .cache/
