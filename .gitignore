@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.log
+*.tmp
+*.bak
+
+# Environment files (never commit secrets)
+.env
+.env.local
+.env.*.local
+.env.production
+*.pem
+*.key
+
+# Tailwind CSS output (generated during build)
+tailwind.config.js
+!tailwind.config.js  # Keep config, ignore output
+*.css
+src/index.css
+!src/index.css  # Keep source CSS, uncomment if you have separate compiled output
+
+# Cache files
+.cache/
+.parcel-cache/
+.eslintcache
+.oxlintcache
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/
+*.temp
