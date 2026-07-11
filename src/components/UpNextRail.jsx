@@ -7,9 +7,9 @@ export default function UpNextRail({ channel, related }) {
   return (
     <div className="rounded-lg border border-white/10 bg-panel overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-smoke flex items-center gap-2">
-          <Radio size={12} className="text-cyan" />
+      <div className="px-3 md:px-4 py-2.5 md:py-3 border-b border-white/10 flex items-center justify-between">
+        <p className="font-mono text-[10px] md:text-[11px] uppercase tracking-widest text-smoke flex items-center gap-1.5 md:gap-2">
+          <Radio size={10} className="md:size-3" />
           More like this
         </p>
         <span className="h-1.5 w-1.5 rounded-full bg-crimson animate-pulse" />
@@ -21,10 +21,10 @@ export default function UpNextRail({ channel, related }) {
           <li key={c.id}>
             <Link
               to={`/watch/${encodeURIComponent(c.id)}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-panel2 transition-colors group"
+              className="flex items-center gap-2.5 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 hover:bg-panel2 transition-colors group"
             >
               {/* Thumbnail */}
-              <span className="relative h-12 w-16 shrink-0 rounded overflow-hidden bg-gradient-to-br from-panel2 to-void flex items-center justify-center border border-white/5">
+              <span className="relative h-10 w-14 md:h-12 md:w-16 shrink-0 rounded overflow-hidden bg-gradient-to-br from-panel2 to-void flex items-center justify-center border border-white/5">
                 {c.logo ? (
                   <img
                     src={c.logo}
@@ -38,31 +38,31 @@ export default function UpNextRail({ channel, related }) {
                   />
                 ) : null}
                 <span className={`absolute inset-0 flex items-center justify-center ${c.logo ? 'hidden' : ''}`}>
-                  <Radio size={16} strokeWidth={1.2} className="text-smoke/50" />
+                  <Radio size={14} className="md:size-4 text-smoke/50" strokeWidth={1.2} />
                 </span>
                 {/* Live indicator */}
-                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-crimson animate-pulse shadow-lg shadow-crimson/50" />
+                <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-crimson animate-pulse shadow-lg shadow-crimson/50" />
               </span>
 
               {/* Info */}
               <span className="min-w-0 flex-1">
-                <p className="font-medium text-sm text-paper truncate group-hover:text-cyan transition-colors">
+                <p className="font-medium text-xs md:text-sm text-paper truncate group-hover:text-cyan transition-colors">
                   {c.name}
                 </p>
-                <p className="font-mono text-[10px] text-smoke flex items-center gap-1.5 mt-0.5">
+                <p className="font-mono text-[9px] md:text-[10px] text-smoke flex items-center gap-1 mt-0.5">
                   <span>{c.country?.flag}</span>
-                  <span>{c.categories?.[0]?.name || 'Live TV'}</span>
+                  <span className="truncate">{c.categories?.[0]?.name || 'Live TV'}</span>
                   {c.qualities?.length > 0 && (
                     <>
                       <span className="text-white/20">·</span>
-                      <span className="text-cyan/60">{c.qualities[0]}</span>
+                      <span className="text-cyan/60 hidden sm:inline">{c.qualities[0]}</span>
                     </>
                   )}
                 </p>
               </span>
 
               {/* Arrow */}
-              <ChevronRight size={14} className="text-smoke/30 group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
+              <ChevronRight size={12} className="md:size-3.5 text-smoke/30 group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
             </Link>
           </li>
         ))}
@@ -72,7 +72,7 @@ export default function UpNextRail({ channel, related }) {
       {related.length > 6 && (
         <Link
           to={`/browse?country=${channel.country?.code || 'BD'}`}
-          className="block text-center py-3 border-t border-white/5 font-mono text-[10px] uppercase tracking-widest text-smoke hover:text-cyan hover:bg-panel2 transition-colors"
+          className="block text-center py-2.5 md:py-3 border-t border-white/5 font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-smoke hover:text-cyan hover:bg-panel2 transition-colors"
         >
           View all {related.length} channels →
         </Link>

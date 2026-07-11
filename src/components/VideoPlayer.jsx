@@ -3,6 +3,7 @@ import Hls from "hls.js";
 import {
   Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2,
   ChevronDown, Wifi, WifiOff, RefreshCw, Layers, Gauge,
+  RotateCcw,
 } from "lucide-react";
 
 export default function VideoPlayer({ channel, onStreamChange }) {
@@ -23,6 +24,31 @@ export default function VideoPlayer({ channel, onStreamChange }) {
   const [qualityOpen, setQualityOpen] = useState(false);
   const [streamOpen, setStreamOpen] = useState(false);
   const [currentStreamIndex, setCurrentStreamIndex] = useState(0);
+  const [orientationLocked, setOrientationLocked] = useState(false);
+
+  // Check if mobile device
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  // Lock/unlock screen orientation
+  const toggleOrientationLock = useCallback(async () => {
+    if (screen.orientation && screen.orientation.lock) {
+      try {
+        if (orientationLocked) {
+          screen.orientation.unlock();
+          setOrientationLocked(false);
+        } else {
+          await screen.orientation.lock('landscape');
+          setOrientationLocked(true);
+        }
+      } catch (e) {
+        // Fallback: just toggle state and show hint
+        setOrientationLocked(!orientationLocked);
+      }
+    } else {
+      // Browser doesn't support orientation lock
+      setOrientationLocked(!orientationLocked);
+    }
+  }, [orientationLocked]);
 
   const currentStream = channel?.allStreams?.[currentStreamIndex] || channel?.primaryStream;
   const hasMultipleStreams = (channel?.allStreams?.length || 0) > 1;
@@ -220,16 +246,16 @@ export default function VideoPlayer({ channel, onStreamChange }) {
 
       {/* Loading overlay */}
       {loading && !error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/80 backdrop-blur-sm">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 md:gap-4 bg-black/80 backdrop-blur-sm">
           <div className="relative">
-            <Loader2 size={40} className="animate-spin text-cyan" />
+            <Loader2 size={32} className="animate-spin text-cyan md:size-10" />
             <div className="absolute inset-0 animate-spin text-cyan/50 blur-sm">
-              <Loader2 size={40} />
+              <Loader2 size={32} className="md:size-10" />
             </div>
           </div>
-          <div className="text-center">
-            <p className="font-mono text-xs uppercase tracking-widest text-white/80 mb-1">Tuning in</p>
-            <p className="font-mono text-[10px] text-white/40">{channel?.name}</p>
+          <div className="text-center px-4">
+            <p className="font-mono text-[10px] md:text-xs uppercase tracking-widest text-white/80 mb-0.5 md:mb-1">Tuning in</p>
+            <p className="font-mono text-[9px] md:text-[10px] text-white/40 truncate max-w-[200px]">{channel?.name}</p>
           </div>
         </div>
       )}
@@ -267,42 +293,42 @@ export default function VideoPlayer({ channel, onStreamChange }) {
 
       {/* Top bar */}
       <div
-        className={`absolute top-0 inset-x-0 p-3 md:p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent transition-all duration-300 ${
+        className={`absolute top-0 inset-x-0 p-2 md:p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent transition-all duration-300 ${
           controlsVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
         }`}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           {/* Channel info */}
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-3 w-3">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <span className="relative flex h-2.5 w-2.5 md:h-3 md:w-3 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-crimson opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-crimson"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-crimson"></span>
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
               {channel?.logo && (
                 <img
                   src={channel.logo}
                   alt=""
-                  className="h-6 w-auto object-contain"
+                  className="h-5 w-5 md:h-6 md:w-6 object-contain"
                   onError={(e) => e.target.style.display = 'none'}
                 />
               )}
-              <span className="font-mono text-xs uppercase tracking-wider text-white">
+              <span className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-white truncate">
                 {channel?.name}
               </span>
             </div>
           </div>
 
           {/* Live badge */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             {currentStream?.quality && (
-              <span className="hidden sm:flex items-center gap-1 font-mono text-[10px] text-white/60 bg-white/10 px-2 py-1 rounded-sm">
-                <Gauge size={10} />
+              <span className="hidden xs:flex items-center gap-1 font-mono text-[9px] md:text-[10px] text-white/60 bg-white/10 px-1.5 md:px-2 py-0.5 md:py-1 rounded-sm">
+                <Gauge size={8} md:size={10} />
                 {currentStream.quality}
               </span>
             )}
-            <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-white bg-crimson px-2.5 py-1 rounded-sm">
-              <Wifi size={10} className="text-white" />
+            <span className="flex items-center gap-1 font-mono text-[9px] md:text-[10px] uppercase tracking-wider text-white bg-crimson px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-sm">
+              <Wifi size={8} md:size={10} className="text-white" />
               LIVE
             </span>
           </div>
@@ -318,11 +344,11 @@ export default function VideoPlayer({ channel, onStreamChange }) {
             controlsVisible && !playing ? "opacity-100 scale-100" : "opacity-0 scale-90"
           }`}
         >
-          <span className="h-16 w-16 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl hover:bg-black/80 hover:scale-110 transition-all">
+          <span className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl hover:bg-black/80 hover:scale-110 transition-all">
             {playing ? (
-              <Pause size={28} fill="currentColor" className="text-white" />
+              <Pause size={22} className="sm:w-7 sm:h-7" fill="currentColor" />
             ) : (
-              <Play size={28} fill="currentColor" className="text-white ml-1" />
+              <Play size={22} className="sm:w-7 sm:h-7" fill="currentColor" />
             )}
           </span>
         </button>
@@ -334,16 +360,16 @@ export default function VideoPlayer({ channel, onStreamChange }) {
           controlsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
         }`}
       >
-        <div className="flex items-center gap-4 md:gap-6">
+        <div className="flex items-center gap-3 md:gap-6">
           {/* Play/Pause */}
           <button onClick={togglePlay} aria-label={playing ? "Pause" : "Play"} className="text-white hover:text-cyan transition-colors">
-            {playing ? <Pause size={22} /> : <Play size={22} fill="currentColor" />}
+            {playing ? <Pause size={20} className="md:w-[22px] md:h-[22px]" /> : <Play size={20} className="md:w-[22px] md:h-[22px]" fill="currentColor" />}
           </button>
 
           {/* Volume */}
           <div className="flex items-center gap-2 group/vol">
             <button onClick={toggleMute} aria-label={muted ? "Unmute" : "Mute"} className={`flex items-center justify-center w-6 h-6 transition-colors ${muted || volume === 0 ? "text-crimson" : "text-white hover:text-crimson"}`}>
-              {muted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              {muted || volume === 0 ? <VolumeX size={18} className="md:w-5 md:h-5" /> : <Volume2 size={18} className="md:w-5 md:h-5" />}
             </button>
             <div className="w-0 group-hover/vol:w-20 transition-all duration-200 overflow-hidden flex items-center">
               <input
@@ -462,9 +488,20 @@ export default function VideoPlayer({ channel, onStreamChange }) {
             </div>
           )}
 
+          {/* Rotate Screen (mobile only) */}
+          {isMobile && fullscreen && (
+            <button
+              onClick={toggleOrientationLock}
+              aria-label="Rotate screen"
+              className={`text-white/70 hover:text-white transition-colors ${orientationLocked ? 'text-cyan' : ''}`}
+            >
+              <RotateCcw size={18} className="md:w-5 md:h-5" />
+            </button>
+          )}
+
           {/* Fullscreen */}
           <button onClick={toggleFullscreen} aria-label="Fullscreen" className="text-white/70 hover:text-white transition-colors">
-            {fullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+            {fullscreen ? <Minimize size={18} className="md:w-5 md:h-5" /> : <Maximize size={18} className="md:w-5 md:h-5" />}
           </button>
         </div>
       </div>

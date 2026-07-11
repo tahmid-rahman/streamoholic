@@ -59,7 +59,7 @@ export default function Footer() {
       <div className="border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="font-mono text-[11px] text-smoke">© 2026 Streamoholic. All rights reserved.</p>
-          <p className="font-mono text-[11px] text-smoke">Developed by <span className="text-cyan">ART</span></p>
+          <p className="font-mono text-[11px] text-smoke">Developed by <a href="https://abdur-rahman-two.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-cyan hover:text-paper transition-colors">ART</a></p>
         </div>
       </div>
     </footer>

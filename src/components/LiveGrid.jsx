@@ -11,25 +11,25 @@ export default function LiveGrid() {
   const filtered = allChannels.slice(0, 6);
 
   return (
-    <section id="guide" className="max-w-7xl mx-auto px-6 md:px-10 py-24 md:py-32">
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
+    <section id="guide" className="max-w-7xl mx-auto px-4 md:px-10 py-16 md:py-24 lg:py-32">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-6 md:mb-10">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-widest text-crimson mb-3">Live guide</p>
-          <h2 className="font-display font-800 uppercase text-4xl md:text-5xl leading-none text-balance">
+          <p className="font-mono text-[10px] md:text-[11px] uppercase tracking-widest text-crimson mb-2 md:mb-3">Live guide</p>
+          <h2 className="font-display font-800 uppercase text-2xl md:text-4xl lg:text-5xl leading-none text-balance">
             What's on right now
           </h2>
         </div>
-        <p className="text-smoke max-w-sm text-sm">
+        <p className="text-smoke max-w-sm text-xs md:text-sm">
           A preview of the guide. Tap a category to narrow it, or jump straight into the full lineup.
         </p>
       </div>
 
-      <div id="categories" className="flex flex-wrap items-center gap-2 mb-10">
+      <div id="categories" className="flex flex-wrap items-center gap-1.5 md:gap-2 mb-6 md:mb-10">
         {categories.map((c) => (
           <button
             key={c.id}
             onClick={() => setActive(c.name)}
-            className={`font-mono text-xs uppercase tracking-wide px-4 py-2 rounded-sm border transition-colors ${
+            className={`font-mono text-[10px] md:text-xs uppercase tracking-wide px-2.5 md:px-4 py-1.5 md:py-2 rounded-sm border transition-colors ${
               active === c.name
                 ? "bg-paper text-void border-paper"
                 : "border-white/10 text-smoke hover:text-paper hover:border-white/30"
@@ -40,13 +40,13 @@ export default function LiveGrid() {
         ))}
         <Link
           to="/browse"
-          className="ml-auto font-mono text-xs uppercase tracking-wide px-4 py-2 rounded-sm border border-crimson/40 text-crimson hover:bg-crimson/10 transition-colors"
+          className="ml-auto font-mono text-[10px] md:text-xs uppercase tracking-wide px-3 md:px-4 py-1.5 md:py-2 rounded-sm border border-crimson/40 text-crimson hover:bg-crimson/10 transition-colors"
         >
-          Full live guide →
+          Full guide →
         </Link>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
         <AnimatePresence mode="popLayout">
           {filtered.map((ch, i) => (
             <ChannelCard key={ch.id} channel={ch} index={i} />

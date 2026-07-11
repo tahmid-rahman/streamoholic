@@ -148,5 +148,59 @@ export function getStreamsByQuality(channel, quality) {
 // Get all available countries with flags
 export const countries = getCountries();
 
-// Default to Bangladesh
-export const DEFAULT_COUNTRY = 'BD';
+// Fallback default (Bangladesh)
+export const FALLBACK_COUNTRY = 'BD';
+
+// Detect user's country via IP geolocation
+// Caches result in sessionStorage to avoid repeated API calls
+export async function detectUserCountry() {
+  const cacheKey = 'streamoholic_detected_country';
+
+  // Check cache first (sessionStorage persists across page loads but not tabs)
+  const cached = sessionStorage.getItem(cacheKey);
+  if (cached) return cached;
+
+  try {
+    // Using ipapi.co free API (no API key required, 1000 req/day)
+    const res = await fetch('https://ipapi.co/json/', {
+      timeout: 5000
+    });
+    if (!res.ok) throw new Error('Geolocation API error');
+
+    const data = await res.json();
+    const userCountryCode = data?.country_code;
+
+    // Check if we have this country in our available countries
+    if (userCountryCode && countries.some(c => c.code === userCountryCode)) {
+      sessionStorage.setItem(cacheKey, userCountryCode);
+      return userCountryCode;
+    }
+  } catch (err) {
+    console.warn('Could not detect user location, using default:', err.message);
+  }
+
+  // Fallback to BD
+  sessionStorage.setItem(cacheKey, FALLBACK_COUNTRY);
+  return FALLBACK_COUNTRY;
+}
+
+// Hook to detect and use the user's country
+// Usage: const { country, loading } = useUserCountry()
+import { useState, useEffect } from 'react';
+
+export function useUserCountry() {
+  const [country, setCountry] = useState(FALLBACK_COUNTRY);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    detectUserCountry().then((detected) => {
+      setCountry(detected);
+      setLoading(false);
+    });
+  }, []);
+
+  return { country, loading };
+}
+
+// DEFAULT_COUNTRY kept for backward compatibility (static)
+export const DEFAULT_COUNTRY = FALLBACK_COUNTRY;

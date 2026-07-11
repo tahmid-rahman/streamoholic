@@ -5,9 +5,9 @@ import ChannelDial from "./ChannelDial";
 
 export default function Hero() {
   return (
-    <section id="top" className="relative pt-32 md:pt-44 pb-20 md:pb-28 px-6 md:px-10 overflow-hidden">
+    <section id="top" className="relative pt-24 pb-16 md:pt-44 md:pb-28 px-4 md:px-10 overflow-hidden">
       <div className="absolute inset-0 bg-noise pointer-events-none" />
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-14 items-center relative">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-14 items-center relative">
         <div>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -25,7 +25,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-display font-800 uppercase leading-[0.9] text-[clamp(3rem,8vw,6rem)] text-balance"
+            className="font-display font-800 uppercase leading-[0.92] text-[clamp(2.2rem,7vw,6rem)] text-balance"
           >
             Live TV,
             <br />

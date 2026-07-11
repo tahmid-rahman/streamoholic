@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Search, ChevronDown, Globe, Radio, X, Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ChannelCard from "../components/ChannelCard";
-import { getChannels, getCountries, getCategories, DEFAULT_COUNTRY } from "../utils/iptvData";
+import { getChannels, getCountries, getCategories, useUserCountry } from "../utils/iptvData";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -14,10 +15,36 @@ const sorts = [
 ];
 
 export default function Browse() {
-  const [country, setCountry] = useState(DEFAULT_COUNTRY);
-  const [active, setActive] = useState("All");
-  const [query, setQuery] = useState("");
-  const [sort, setSort] = useState("az");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { country: defaultCountry, loading: countryLoading } = useUserCountry();
+
+  // Initialize from URL params, fall back to defaults
+  const [country, setCountry] = useState(() => searchParams.get("country") || defaultCountry);
+  const [active, setActive] = useState(() => searchParams.get("category") || "All");
+  const [query, setQuery] = useState(() => searchParams.get("q") || "");
+  const [sort, setSort] = useState(() => searchParams.get("sort") || "az");
+  const [initialSet, setInitialSet] = useState(false);
+
+  // Update country once geolocation resolves (only if no URL override)
+  useEffect(() => {
+    if (!countryLoading && !initialSet) {
+      if (!searchParams.get("country")) {
+        setCountry(defaultCountry);
+      }
+      setInitialSet(true);
+    }
+  }, [countryLoading, defaultCountry, initialSet, searchParams]);
+
+  // Sync state changes to URL
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (country && country !== defaultCountry) params.set("country", country);
+    if (active && active !== "All") params.set("category", active);
+    if (query) params.set("q", query);
+    if (sort && sort !== "az") params.set("sort", sort);
+    setSearchParams(params, { replace: true });
+  }, [country, active, query, sort, defaultCountry, setSearchParams]);
+
   const [sortOpen, setSortOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
@@ -124,50 +151,57 @@ export default function Browse() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-10 pt-28 md:pt-36 pb-24">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-2">
-          <span className="relative flex h-2 w-2">
+        <div className="flex items-center gap-2 md:gap-3 mb-2">
+          <span className="relative flex h-1.5 w-1.5 md:h-2 md:w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-crimson opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-crimson"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-crimson"></span>
           </span>
-          <p className="font-mono text-[11px] uppercase tracking-widest text-crimson">Live guide</p>
+          <p className="font-mono text-[10px] md:text-[11px] uppercase tracking-widest text-crimson">Live guide</p>
         </div>
-        <h1 className="font-display font-800 uppercase text-3xl md:text-5xl leading-none mb-6 text-balance">
-          {currentCountry?.flag} {currentCountry?.name} Channels
+        <h1 className="font-display font-800 uppercase text-2xl md:text-5xl leading-none mb-4 md:mb-6 text-balance">
+          {countryLoading ? (
+            <span className="animate-pulse">Detecting your location...</span>
+          ) : (
+            <>
+              {currentCountry?.flag} {currentCountry?.name} Channels
+            </>
+          )}
         </h1>
 
         {/* Country Selector */}
-        <div className="relative inline-block mb-6 dropdown-trigger">
+        <div className="relative inline-block mb-4 md:mb-6 dropdown-trigger">
           <button
             onClick={(e) => {
               e.stopPropagation();
               setCountryOpen((o) => !o);
               setSortOpen(false);
             }}
-            className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-wide text-paper hover:text-cyan border border-white/10 hover:border-cyan/40 rounded-sm px-4 py-2.5 transition-all bg-panel hover:bg-panel2"
+            className="flex items-center gap-2 font-mono text-[10px] md:text-xs uppercase tracking-wide text-paper hover:text-cyan border border-white/10 hover:border-cyan/40 rounded-sm px-3 md:px-4 py-2 md:py-2.5 transition-all bg-panel hover:bg-panel2"
           >
-            <Globe size={15} />
-            <span>{currentCountry?.name}</span>
-            <span className="text-smoke/60">({currentCountry?.count})</span>
-            <ChevronDown size={14} className={`transition-transform ${countryOpen ? 'rotate-180' : ''}`} />
+            <Globe size={13} className="md:size-[15px]" />
+            <span className="hidden sm:inline">{currentCountry?.name}</span>
+            <span className="sm:hidden">{currentCountry?.flag}</span>
+            <span className="text-smoke/60 hidden sm:inline">({currentCountry?.count})</span>
+            <ChevronDown size={12} className={`transition-transform ${countryOpen ? 'rotate-180' : ''}`} />
           </button>
           {countryOpen && (
-            <div className="absolute left-0 mt-2 w-72 max-h-80 overflow-y-auto rounded-lg border border-white/10 bg-panel shadow-2xl z-30">
-              <div className="sticky top-0 bg-panel border-b border-white/10 px-4 py-2">
+            <div className="absolute left-0 mt-2 w-60 md:w-72 max-h-64 md:max-h-80 overflow-y-auto rounded-lg border border-white/10 bg-panel shadow-2xl z-30">
+              <div className="sticky top-0 bg-panel border-b border-white/10 px-3 md:px-4 py-2">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-smoke">Select Country</p>
               </div>
               {countries.map((c) => (
                 <button
                   key={c.code}
                   onClick={() => handleCountryChange(c.code)}
-                  className={`w-full text-left flex items-center justify-between px-4 py-2.5 text-sm hover:bg-panel2 transition-colors ${
+                  className={`w-full text-left flex items-center justify-between px-3 md:px-4 py-2 md:py-2.5 text-sm hover:bg-panel2 transition-colors ${
                     country === c.code ? "text-cyan bg-panel2" : "text-paper"
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     <span>{c.flag}</span>
-                    <span>{c.name}</span>
+                    <span className="text-xs md:text-sm">{c.name}</span>
                   </span>
-                  <span className="font-mono text-xs text-smoke/60">{c.count}</span>
+                  <span className="font-mono text-[10px] text-smoke/60">{c.count}</span>
                 </button>
               ))}
             </div>
@@ -175,41 +209,42 @@ export default function Browse() {
         </div>
 
         {/* Search and Sort Row */}
-        <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 lg:flex-row lg:items-center lg:justify-between mb-6 md:mb-8">
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-smoke" />
+          <div className="relative flex-1 max-w-full sm:max-w-md">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-smoke" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search channels..."
-              className="w-full rounded-sm bg-panel2 border border-white/10 pl-10 pr-10 py-2.5 text-sm text-paper placeholder:text-smoke/60 focus:border-cyan/60 outline-none transition-colors"
+              className="w-full rounded-sm bg-panel2 border border-white/10 pl-9 pr-9 py-2 text-xs md:text-sm text-paper placeholder:text-smoke/60 focus:border-cyan/60 outline-none transition-colors"
             />
             {query && (
               <button
                 onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-smoke hover:text-paper transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-smoke hover:text-paper transition-colors p-1"
               >
-                <X size={14} />
+                <X size={12} />
               </button>
             )}
           </div>
 
           {/* Sort */}
-          <div className="relative dropdown-trigger">
+          <div className="relative dropdown-trigger self-start sm:self-auto">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setSortOpen((o) => !o);
                 setCountryOpen(false);
               }}
-              className="flex items-center gap-2 font-mono text-xs uppercase tracking-wide text-smoke hover:text-paper border border-white/10 rounded-sm px-4 py-2.5 transition-colors hover:bg-panel2"
+              className="flex items-center gap-1.5 md:gap-2 font-mono text-[10px] md:text-xs uppercase tracking-wide text-smoke hover:text-paper border border-white/10 rounded-sm px-3 md:px-4 py-2 md:py-2.5 transition-colors hover:bg-panel2"
             >
-              Sort: <span className="text-paper">{sorts.find((s) => s.id === sort)?.label}</span>
-              <ChevronDown size={14} />
+              <span className="hidden sm:inline">Sort:</span>
+              <span className="text-paper">{sorts.find((s) => s.id === sort)?.label}</span>
+              <ChevronDown size={12} />
             </button>
             {sortOpen && (
-              <div className="absolute right-0 mt-2 w-44 rounded-lg border border-white/10 bg-panel shadow-xl z-20 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-36 md:w-44 rounded-lg border border-white/10 bg-panel shadow-xl z-20 overflow-hidden">
                 {sorts.map((s) => (
                   <button
                     key={s.id}
@@ -217,7 +252,7 @@ export default function Browse() {
                       setSort(s.id);
                       setSortOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2.5 text-xs font-mono uppercase tracking-wide hover:bg-panel2 transition-colors ${
+                    className={`w-full text-left px-3 md:px-4 py-2 md:py-2.5 text-[10px] md:text-xs font-mono uppercase tracking-wide hover:bg-panel2 transition-colors ${
                       sort === s.id ? "text-cyan bg-panel2" : "text-paper"
                     }`}
                   >

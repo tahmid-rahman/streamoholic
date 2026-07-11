@@ -62,7 +62,7 @@ export default function Watch() {
       <Navbar />
 
       <main className="max-w-[1600px] mx-auto px-4 md:px-8 pt-20 md:pt-24 pb-20">
-        <div className="grid lg:grid-cols-[1fr,360px] gap-8">
+        <div className="grid lg:grid-cols-[1fr,360px] gap-6 lg:gap-8">
           {/* Main Content */}
           <div>
             <VideoPlayer channel={channel} />
@@ -74,36 +74,38 @@ export default function Watch() {
               className="mt-6"
             >
               {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-smoke font-mono text-[11px] uppercase tracking-wide mb-4">
-                <Link to="/browse" className="hover:text-cyan transition-colors flex items-center gap-1">
-                  <Tv size={12} />
-                  Live Guide
+              <div className="flex items-center gap-1.5 text-smoke font-mono text-[9px] md:text-[11px] uppercase tracking-wide mb-3 md:mb-4 overflow-x-auto whitespace-nowrap pb-1">
+                <Link to="/browse" className="hover:text-cyan transition-colors flex items-center gap-1 shrink-0">
+                  <Tv size={10} className="md:size-3" />
+                  <span className="hidden sm:inline">Live Guide</span>
+                  <span className="sm:hidden">Guide</span>
                 </Link>
-                <ChevronRight size={12} />
-                <span className="flex items-center gap-1">
-                  <Globe size={12} />
-                  {channel.country?.flag} {channel.country?.name}
+                <ChevronRight size={10} className="shrink-0" />
+                <span className="flex items-center gap-1 shrink-0">
+                  <Globe size={10} className="md:size-3" />
+                  <span className="hidden xs:inline">{channel.country?.flag} {channel.country?.name}</span>
+                  <span className="xs:hidden">{channel.country?.flag}</span>
                 </span>
-                <ChevronRight size={12} />
-                <span className="text-cyan">{primaryCategory}</span>
+                <ChevronRight size={10} className="shrink-0" />
+                <span className="text-cyan shrink-0">{primaryCategory}</span>
               </div>
 
               {/* Channel Name & Logo */}
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-3 mb-4">
                 {channel.logo && (
                   <img
                     src={channel.logo}
                     alt={channel.name}
-                    className="h-14 w-auto object-contain drop-shadow-lg"
+                    className="h-12 md:h-14 w-auto object-contain drop-shadow-lg"
                     onError={(e) => e.target.style.display = 'none'}
                   />
                 )}
-                <div>
-                  <h1 className="font-display font-800 uppercase text-2xl md:text-3xl leading-tight text-paper">
+                <div className="min-w-0">
+                  <h1 className="font-display font-800 uppercase text-xl md:text-3xl leading-tight text-paper truncate">
                     {channel.name}
                   </h1>
                   {channel.network && (
-                    <p className="text-smoke text-sm mt-1">{channel.network}</p>
+                    <p className="text-smoke text-xs md:text-sm mt-0.5 truncate">{channel.network}</p>
                   )}
                 </div>
               </div>
@@ -117,7 +119,7 @@ export default function Watch() {
               )}
 
               {/* Meta Info */}
-              <div className="flex flex-wrap items-center gap-3 mb-6">
+              <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-4 md:mb-6">
                 {channel.feeds?.[0]?.format && (
                   <span className="flex items-center gap-1.5 font-mono text-xs text-paper bg-panel2 px-3 py-1.5 rounded-sm border border-white/10">
                     <Tv size={12} className="text-cyan" />
@@ -207,7 +209,7 @@ export default function Watch() {
                     Browse All <ChevronRight size={14} />
                   </Link>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                   {related.map((c, i) => (
                     <ChannelCard key={c.id} channel={c} index={i} />
                   ))}
@@ -217,7 +219,7 @@ export default function Watch() {
           </div>
 
           {/* Sidebar */}
-          <aside className="space-y-6">
+          <aside className="space-y-4 md:space-y-6">
             {/* Channel Categories */}
             <div className="rounded-lg border border-white/10 bg-panel overflow-hidden">
               <div className="px-4 py-3 border-b border-white/10">

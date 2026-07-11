@@ -48,7 +48,7 @@ export default function Navbar() {
         scrolled ? "bg-void/90 backdrop-blur-md border-b border-white/5" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-10 flex items-center justify-between h-14 md:h-20">
         <Link to="/" className="flex items-center gap-2.5 group">
           <span className="relative flex h-8 w-8 items-center justify-center rounded-sm bg-crimson">
             <Tv size={16} strokeWidth={2.5} className="text-paper" />
@@ -158,7 +158,7 @@ export default function Navbar() {
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="md:hidden bg-void border-t border-white/5 px-6 py-4 flex flex-col gap-4 font-mono text-sm uppercase"
+          className="md:hidden bg-void border-t border-white/5 px-4 py-4 flex flex-col gap-3 font-mono text-xs sm:text-sm uppercase"
         >
           <Link to="/search" onClick={() => setOpen(false)} className="text-smoke hover:text-paper">
             Search
