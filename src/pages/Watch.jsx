@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Heart, HeartOff, Share2, Globe, ExternalLink, AlertCircle, ChevronRight, Tv, Languages, Layers } from "lucide-react";
+import { Heart, HeartOff, Share2, Globe, ExternalLink, AlertCircle, ChevronRight, Tv, Languages, Layers, RefreshCw } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import VideoPlayer from "../components/VideoPlayer";
@@ -10,10 +10,44 @@ import UpNextRail from "../components/UpNextRail";
 import { getChannelById, getChannels } from "../utils/iptvData";
 import { useLibrary } from "../context/LibraryContext";
 
+// Helper to find channel by ID with fallback for URL encoding variations
+function findChannel(slug) {
+  // Try the direct slug
+  let channel = getChannelById(slug);
+  if (channel) return channel;
+
+  // Try decoded version
+  try {
+    const decoded = decodeURIComponent(slug);
+    channel = getChannelById(decoded);
+    if (channel) return channel;
+  } catch (e) {
+    // decoding failed, continue
+  }
+
+  // Try encoding differences (replace + with space, etc.)
+  try {
+    const normalized = slug.replace(/\+/g, ' ');
+    channel = getChannelById(normalized);
+    if (channel) return channel;
+  } catch (e) {
+    // continue
+  }
+
+  // Search all channels for a match (fuzzy fallback)
+  const allChannels = getChannels('All');
+  const normalizedSlug = slug.toLowerCase().replace(/%20/g, ' ');
+  channel = allChannels.find(c =>
+    c.id.toLowerCase() === normalizedSlug ||
+    c.id.toLowerCase() === decodeURIComponent(slug).toLowerCase()
+  );
+
+  return channel || null;
+}
+
 export default function Watch() {
   const { slug } = useParams();
-  const decodedSlug = decodeURIComponent(slug);
-  const channel = useMemo(() => getChannelById(decodedSlug), [decodedSlug]);
+  const channel = useMemo(() => findChannel(slug), [slug]);
   const { isFavorite, toggleFavorite, recordWatch } = useLibrary();
 
   useEffect(() => {
@@ -31,12 +65,21 @@ export default function Watch() {
           <AlertCircle size={48} className="text-smoke mb-4" />
           <h1 className="font-display font-800 uppercase text-2xl mb-2">Channel Not Found</h1>
           <p className="text-smoke mb-6">The channel you're looking for doesn't exist or has been removed.</p>
-          <Link
-            to="/browse"
-            className="font-mono text-xs uppercase tracking-widest px-6 py-3 bg-cyan text-void hover:bg-cyan/90 transition-colors rounded-sm"
-          >
-            Browse Channels
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest px-6 py-3 bg-panel border border-white/10 text-paper hover:bg-panel2 transition-colors rounded-sm"
+            >
+              <RefreshCw size={14} />
+              Try Again
+            </button>
+            <Link
+              to="/browse"
+              className="font-mono text-xs uppercase tracking-widest px-6 py-3 bg-cyan text-void hover:bg-cyan/90 transition-colors rounded-sm"
+            >
+              Browse Channels
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>

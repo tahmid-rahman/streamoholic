@@ -371,7 +371,8 @@ export default function VideoPlayer({ channel, onStreamChange }) {
             <button onClick={toggleMute} aria-label={muted ? "Unmute" : "Mute"} className={`flex items-center justify-center w-6 h-6 transition-colors ${muted || volume === 0 ? "text-crimson" : "text-white hover:text-crimson"}`}>
               {muted || volume === 0 ? <VolumeX size={18} className="md:w-5 md:h-5" /> : <Volume2 size={18} className="md:w-5 md:h-5" />}
             </button>
-            <div className="w-0 group-hover/vol:w-20 transition-all duration-200 overflow-hidden flex items-center">
+            {/* Always visible on mobile, hover on desktop */}
+            <div className="w-0 sm:group-hover/vol:w-20 transition-all duration-200 overflow-hidden flex items-center touch-auto sm:overflow-hidden">
               <input
                 type="range"
                 min={0}
@@ -379,9 +380,43 @@ export default function VideoPlayer({ channel, onStreamChange }) {
                 step={0.05}
                 value={muted ? 0 : volume}
                 onChange={onVolumeChange}
-                className="w-20 accent-crimson h-1 cursor-pointer"
+                className="w-20 accent-crimson h-1 cursor-pointer touch:w-16 sm:touch:w-0"
                 aria-label="Volume"
               />
+            </div>
+            {/* Touch-friendly volume controls on mobile */}
+            <div className="flex sm:hidden items-center gap-1">
+              <button
+                onClick={() => {
+                  const newVol = Math.max(0, (muted ? volume : (volume - 0.1)));
+                  setVolume(newVol);
+                  if (videoRef.current) {
+                    videoRef.current.volume = newVol;
+                    videoRef.current.muted = newVol === 0;
+                    setMuted(newVol === 0);
+                  }
+                }}
+                className="text-white/70 hover:text-white p-1"
+                aria-label="Decrease volume"
+              >
+                -
+              </button>
+              <span className="text-white/70 text-xs w-6 text-center font-mono">{Math.round((muted ? 0 : volume) * 100)}</span>
+              <button
+                onClick={() => {
+                  const newVol = Math.min(1, (muted ? volume : (volume + 0.1)));
+                  setVolume(newVol);
+                  if (videoRef.current) {
+                    videoRef.current.volume = newVol;
+                    videoRef.current.muted = false;
+                    setMuted(false);
+                  }
+                }}
+                className="text-white/70 hover:text-white p-1"
+                aria-label="Increase volume"
+              >
+                +
+              </button>
             </div>
           </div>
 
